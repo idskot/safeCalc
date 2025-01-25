@@ -1,0 +1,176 @@
+	// Will read total stop time and calculate safe distance
+	//	NOTE: This should be replaced with a submit button
+function updateSafeDistance(){
+		// Define standard approach speeds
+		// ISO uses 1.6 m/s for safe distances > 500mm, and 2.0 m/s for safe distances < 500mm
+		//	ANSI does not give an approach speed, but references 1.6 m/s as a typical value
+	const standardApproachSpeed = {value: 1.6, unit: "m/sec"};
+	const conservativeApproachSpeed = {value: 2.0, unit: "m/sec"};
+		
+		// Declare minimum safe distance, read final distance unit
+	var minimumSafeDistStd = {value: 0, unit: document.getElementById('safeDistReadoutUnits').value};
+	var minimumSafeDistConservative = {value: 0, unit: document.getElementById('safeDistReadoutUnits').value};
+	
+		// Find conversion from meter -> desired length unit
+	let finalSafeDistLengthConv = convertLength({value: 1, unit: "m"}, minimumSafeDistStd.unit);
+		// Find conversion from second -> Stop Time unit
+	let finalSafeDistTimeConv = convertTime({value: 1, unit: "sec"}, totalStopTime.unit);
+	
+		// Calculate the constant value between standard and conservative speeds
+	const minSafeDistanceConst = parseFloat(totalStopTime.value) * ( parseFloat(finalSafeDistLengthConv.value)/parseFloat(finalSafeDistTimeConv.value))
+	
+		// Calculate both conservaitve & standard (std) safe distances utilizing constant calculated above		
+	minimumSafeDistStd.value = parseFloat((parseFloat(standardApproachSpeed.value) * minSafeDistanceConst).toFixed(3));
+	minimumSafeDistConservative.value = parseFloat((parseFloat(conservativeApproachSpeed.value) *  minSafeDistanceConst).toFixed(3));
+
+		// Determine if distance speed is valid, if not set to 0
+	minimumSafeDistStd.value = (minimumSafeDistStd.value >= 0) ? minimumSafeDistStd.value : 0;
+	minimumSafeDistConservative.value = (minimumSafeDistConservative.value >= 0) ? minimumSafeDistConservative.value : 0;	
+	
+		// Write values to Displays
+	document.getElementById('safeDistReadoutStd').value = minimumSafeDistStd.value;
+	document.getElementById('safeDistReadoutCrv').value = minimumSafeDistConservative.value;	
+	
+}
+
+let testAccelTime = {value: 0.3, unit: 'sec'};
+let testMaxSpeed = {value: 60, unit: 'ft/min'};
+let distToMaxSpeed = calcDistToMaxSpeed(testAccelTime, testMaxSpeed);
+console.log('Dist To Max Speed... Value: ' + distToMaxSpeed.value + ', Unit: ' + distToMaxSpeed.unit);
+
+//----------------- Calculate Acceleration Values -----------------//
+function calcAcceleration(accelTime, maxSpeed){
+	// Given acceleration time (time from 0 to maxSpeed), calculate acceleration rate, distance to max speed
+	// EQUATION: accelRate = maxSpeed [dist/time]/accelTime[time] => accelRate [dist/(time)^2]
+	
+		// Convert accel time time unit to match max speed's time unit
+	accelTime = convertTime(accelTime, maxSpeed.unit.substring(maxSpeed.unit.indexOf('/') + 1));
+		
+		// Return acceleration rate in standard {value, unit} format
+	return {value: ( parseFloat(maxSpeed.value) / parseFloat(accelTime.value) ), unit: ( maxSpeed.unit + '^2' )};
+}
+
+//----------------- Calculate Acceleration Time Values -----------------//
+function calcAccelerationTime(accelRate, maxSpeed){
+	// Given acceleration rate, calculate acceleration time [Time from v = 0 -> v = max] or time to max speed
+	// EQUATION: accelRate = maxSpeed [dist/time]/accelTime[time] => accelRate [dist/(time)^2]
+	// EQUATION: accelTime = maxSpeed [dist/time] / accelRate[dist/time^2] => accelTime [time]
+	
+		// Convert accel time time unit to match max speed's time unit
+	accelRateLengthConv = convertLength({value: 1, unit: accelRate.unit.substring(0, accelRate.unit.indexOf('/'))}, maxSpeed.unit.substring(0, maxSpeed.unit.indexOf('/')));
+	accelRateTimeConv = convertTime({value: 1, unit: accelRate.unit.substring(accelRate.unit.indexOf('/') + 1)}, maxSpeed.unit.substring(maxSpeed.unit.indexOf('/') + 1));
+	
+		// Conver acceleration rate to match max speed units
+	accelRate.value = parseFloat(accelRate.value) * (accelRateLengthConv / Math.pow(accelRateTimeConv, 2));
+		// Set acceleration rate units
+	accelRate.unit = maxSpeed.unit + '^2';
+		
+		// Return acceleration time in standard {value, unit} format
+	return {value: ( parseFloat(maxSpeed.value) / parseFloat(accelRate.value) ), unit: ( maxSpeed.unit.indexOf('/'))};
+}
+
+
+//----------------- Calculate Distance to Max Speed (from Stop) -----------------//
+function calcDistToMaxSpeed (accelVal, maxSpeed){
+	// Using Displacement formula of: s = ut + (1/2)*a*t^2, find s
+	//	where: s = displamcent (distance moved), u = initial speed, t = travel time, a = accel rate
+	//	Calculation is looking for total displacement from stop, thus final equation:
+	//		s = (1/2)*a*t^2
+	
+	let accelRate = {value: 0, unit: ""};
+	let accelTime = {value: 0, unit: ""};
+	
+		// Detect if input value is acceleration rate or acceleration time
+	if (accelVal.unit.indexOf('/') == -1){
+		// If indexOf returns value -1, '/' character not found. Thus, acceleration time being used. Calculate accel rate & set accel time
+		accelRate = calcAcceleration(accelVal, maxSpeed);
+		accelTime.value = accelVal.value;
+		accelTime.unit = accelVal.unit;
+	}
+	
+		// Else, accel rate was input
+	else {
+			// Thus set accel rate & calculate acceleration time
+		accelRate.value = accelVal.value;
+		accelRate.unit = accelVal.unit;
+		accelTime = calcAccelerationTime(accelVal, maxSpeed);		
+		
+	}
+
+		// Return distance to max speed in standard {value, unit} format
+	return ({value: (0.5 * parseFloat(accelRate.value) * Math.pow(parseFloat(accelTime.value), 2)), unit: maxSpeed.unit.substring(0, maxSpeed.unit.indexOf('/'))});
+}
+
+//----------------- Calculate Total Time Required To Move Over Set Distance -----------------//
+// NOTE: We need initial velocity, displacement distance, as well as acceleration rate & max speed
+function calcDisplacementTime (initialSpeed, sectorLength, accelRate, maxSpeed){
+	/*----- THEORY OF OP: ----- 
+		There are three different scenarios for calculating displacement time:
+			1) System is purely accelerating
+			2) System is accelerating then runs at max speed
+			3) System is running purely at max speed.
+		
+			For scenario 1) & first part of 2):
+		We can calculate time for acceleration as follows:
+		We can use the displacement formula:
+			(s = ut + (1/2)*a*t^2)					-- Displacement Formula
+		and solve for 't'
+		for acceleration purposes specifically
+		by using the quadratic formula, which results in:
+			[(-b) ± SQRT(b^2 - 4ac)] / [2a]			-- Quadratic Formula
+		
+		Since we are not looking for negative times, we can omit the subtraction format.
+		
+		Setting up the displacement formula in the correct format results in:
+		[(1/2)*a*]t^2 + [u]t - s = 0
+		
+		Utilizing quadratic equation results in:
+			[(-u) + SQRT( (u)^2 - (4*(1/2*a)*(-s))] / [2 * (1/2*a)]
+		=>	[-u + SQRT( (u)^2 + (2as) )] / [a]	
+		
+		Where:
+			u = initialSpeed
+			a = accelRate
+			s = sectorLength	
+			
+		
+			For last part of scenario 2) & all of scenario 3):
+		We can calculate time for displacement by using the following equation:
+			t = v / s
+		
+		Where:
+			v = maxSpeed (Velocity @ Max Speed)
+			s = sectorLength (Total length of section traversing)
+			
+		THUS: First step is to determine if within the sector, system is purely accelerating, OR accelerating & traversing at max speed, OR traversing purely at max speed
+			Second step then is to utilize the above formulas to calculate time required
+	*/
+	
+	let displacementTime = {value: 0, unit: ""};
+	let accelDisplacement = calcDistToMaxSpeed(accelRate, maxSpeed);
+	
+		// Since accel rate is calculated from maxSpeed's unit, convert variables to match 'maxSpeed's units
+	initialSpeed = convertSpeed(initialSpeed, maxSpeed.unit);
+	sectorLength = convertLength(sectorLength, maxSpeed.unit.substring(0, maxSpeed.unit.indexOf('/')));
+	
+		// Detect if initial speed is lower than max speed, thus acceleration required
+	if (initialSpeed.value < maxSpeed.value){
+		// Determine if we will accelerate through entire sector or reach max speed
+		let distFromMotionStart = ( Math.pow(parseFloat(initialSpeed.value), 2) ) / (2 * parseFloat(accelRate.value));
+			// Determine remainder of acceleration distance. IF Sector will finish before
+			// Acceleration is complete, set distance remaining to sector length, otherwise
+			// set to distance required to accel
+		let accelDistanceRemaining = {value: ( (accelDisplacement.value - distFromMotionStart.value) > sectorLength) ? sectorLength : (accelDisplacement.value - distFromMotionStart.value), unit: sectorLength.unit};
+		
+			// Using accel quadratic equation shown above, calc displacement time
+		displacementTime.value += ( (-initialSpeed.value) + Math.sqrt( Math.pow(initialSpeed.value, 2) + (2 * accelRate.value * accelDistanceRemaining.value) ) ) / (accelRate.value);
+		displacementTime.unit = initialSpeed.unit.substring(initialSpeed.unit.indexOf('/') + 1);
+		
+	}
+		// Detect if initial speed is already max speed, if so, we only need to calc max speed time
+	else if (initialSpeed.value == maxSpeed.value){
+		
+	}
+
+
+}

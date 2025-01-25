@@ -1,0 +1,626 @@
+:root{
+ --activeColor: #76cf9f;
+ --hoverColor: #04AA6D;
+ --idleColor: #d1d1d1;
+}
+
+#canvasDisplayWrapper{
+  position:absolute;
+  top: 1%;
+  margin: auto;
+  width: 95%;
+  height: 40%;
+  border-style: groove;
+  overflow: hidden;
+  display: inline-flex;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+fieldset {
+  margin: 20px;
+  padding: 0 10px 10px;
+  border: 1px solid #666;
+  border-radius: 8px;
+  padding-top: 10px;
+  width: 90%;
+}
+
+legend {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.displayCanvasDIV {
+  display: block;
+  position: absolute;
+  height: 95%;
+  width: 98%;
+  padding: 1%;
+}
+
+/* Tool Tip Styles */
+/************** Tool Tip Styles ********************************/
+.toolTip {
+  display: inline-block;
+  position: relative;
+  padding-left: 0.5em;
+}
+.toolTip .toolTipIcon {
+  background: #27b1f0;
+  border-radius: 10px;
+  cursor: help;
+  display: inline-block;
+  font-style: italic;
+  height: 20px;
+  line-height: 1.3em;
+  text-align: center;
+  width: 20px;
+}
+.toolTip .toolTipInfo {
+  display: none;
+  background: var(--activeColor);
+  border: 1px solid var(--activeColor);
+  border-radius: 5px;
+  font-size: 0.875em;
+  padding: .5em;
+  position: absolute;
+  left: 30px;
+  top: -20px;
+  width: 250px;
+  z-index: 2;
+}
+.toolTip .toolTipInfo:before, .toolTip .toolTipInfo:after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 7px;
+  border-style: solid;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent var(--activeColor);
+}
+.toolTip .toolTipInfo:after {
+  left: -8px;
+  border-right-color: var(--activeColor);
+}
+.toolTip .toolTipInfo .info {
+  display: block;
+  background: var(--activeColor);
+}
+.toolTip:hover .toolTipInfo, .toolTip:focus .toolTipInfo {
+  display: inline-block;
+}
+
+a:focus + .toolTip .toolTipInfo {
+  display: inline-block;
+}
+
+/* End of Tool Tip */
+
+.inputSymbol {
+	position: relative;
+}
+
+.inputSymbol > i {
+  position: absolute;
+  display: block;
+  transform: translate(0, -50%);
+  top: 50%;
+  pointer-events: none;
+  width: 25px;
+  text-align: center;
+  font-style: normal;
+}
+
+.inputSymbol > input {
+  padding-left: 25px;
+	padding-right: 0;
+}
+
+.inputSymbolRight > i {
+  right: 50%;
+}
+
+.inputSymbolRight  > input {
+  padding-left: 0;
+  padding-right: 25px;
+  text-align: right;
+}	
+
+.hidden {
+    border: 0;
+    clip-path: rect(0 0 0 0);
+    margin: -1px;
+	max-width: 0px;
+}
+
+.inputHeader {
+	margin-right: 5%;
+}
+
+.inputGridWrapper, .inputGridWrapperHeader {
+	display: grid;
+	width: 90%;
+	grid-template-columns: 5fr 1fr 2fr 1fr;
+	padding: 1em;
+}
+
+.inputGridWrapper > div, .inputGridWrapperHeader > div{
+	/*border: 1px dashed black;*/
+	padding: 0.1em;
+}
+
+.inputGridWrapper > .inputGrid, .inputGridWrapperHeader > .inputGrid {
+	text-align: right;
+}
+
+.inputGridWrapper > .inputUnitsGrid, .inputGridWrapperHeader > .inputUnitsGrid {
+	padding-left: 5%;
+}
+
+
+.inputGridWrapper .inputSetting, .inputGridWrapperHeader .inputSetting {
+	text-align: center;
+}
+
+body {
+  background: transparent;
+  color: #000000;
+  padding: 0 24px;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow: hidden;
+}
+
+#patternResultsDIV {
+  margin: auto;
+}
+
+#tabDisplayWrapper {
+  position: absolute;
+  bottom: 0;
+  left: 1%;
+  width: 96%;
+  height: 55%;
+  padding-left: 1%;
+  padding-right: 1%;
+}
+
+.tab {
+  overflow: hidden;
+  border: 1px solid #d1d1d1;
+  background-color: #f1f1f1;
+  width: max-content;
+}
+
+.tab .tabLink {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 16px;
+}
+
+.tab .tabLink:hover{
+  background-color: var(--hoverColor);
+}
+
+.tab .tabLink.active {
+  background-color: var(--activeColor);
+}
+
+.tabContent {
+  display: none;
+  padding: 2% 3%;
+  border: 1px solid #d1d1d1;
+  max-width: 95%;
+  height: 80%;
+}
+
+.tabContent .tabContentMargins {
+ width: 2%;
+ display: inline-block;
+}
+
+.tabContent .tabContentContainer {
+ display: inline-block;
+ flex: 1;
+ overflow-y: auto;
+}
+
+.inputUnits {
+	margin-left:2px;
+	margin-right: 5px;
+}
+
+.tabContent .bottomDisplayWrapper {
+  position: absolute; 
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  display: inline-block;
+  width: 100%;
+}
+
+.bottomDisplayDIV {
+  display: inline-block;
+  justify-content: center;
+  width: 45%;
+}
+
+
+.indentSpan {
+  margin-left: 5%;
+}
+
+.inputTable td:{
+	margin-left: auto;
+	margin-right: auto;
+	align: center;
+}
+
+.inputTable td:not(:first-child){
+	padding-left: 5%;
+}
+
+
+#patternTableContainer {
+  max-height: 60%;
+  min-width: 100%;
+  overflow: auto;
+}
+
+#patternSelectTableWrapper {
+  width: 60%;
+
+}
+
+#totalStopTimeCalc > input[type='number']{
+	text-align: center;
+	width: 30%;
+	min-width: 50px;
+	margin-left: 2%;
+}
+
+#totalStopTimeCalc  > input[type='text']{
+	text-align: center;
+	width: 45%;
+	min-width: 100px;
+	margin-left: 2%
+}
+
+#totalStopTimeCalc  > select{
+	font: 13px Arial, sans-serif;
+}
+
+
+
+input[type='number'], input[type='text']{
+  text-align: center;
+  width: 50%; 
+  min-width: 100px;
+}
+
+input[type='number']:read-only, input[type='text']:read-only{
+  background-color: silver;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.inputSelect {
+  text-align: center;
+  width: 50%; 
+  min-width: 100px;
+}
+
+
+.dropbtn {
+  background-color: var(--activeColor);
+  color: #ffffff;
+  padding: 8px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin: auto;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  border: 1px;
+  border-radius: 1px;
+  background-color: var(--activeColor);
+  min-width: 250px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content button:nth-child(even){
+  background-color: #d1d1d1;
+}
+
+.dropdown-content button {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  width: 100%;
+  border: none;
+  display: block;
+}
+
+.dropdown-content button:hover {
+  background-color: var(--hoverColor);
+}
+
+.dropdown-content button.active {
+  background-color: var(--hoverColor);
+  color: #ffffff;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: var(--hoverColor);
+}
+
+.dropUpbtn {
+  background-color: var(--activeColor);
+  color: #ffffff;
+  padding: 8px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.dropup {
+  position: relative;
+  display: inline-block;
+  margin-top: 150px;
+}
+
+.dropup-content {
+  display: none;
+  position: absolute;
+  border: 1px;
+  border-radius: 1px;
+  background-color: var(--activeColor);
+  min-width: 250px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  bottom: 35px;
+  z-index: 1;
+}
+
+.dropup-content button:nth-child(even){
+  background-color: #d1d1d1;
+}
+
+.dropup-content button {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  width: 100%;
+  border: none;
+  display: block;
+}
+
+.dropup-content button:hover {
+  background-color: var(--hoverColor);
+}
+
+.dropup-content button.active {
+  background-color: var(--hoverColor);
+  color: #ffffff;
+}
+
+.dropup:hover .dropup-content {
+  display: block;
+}
+
+.dropup:hover .dropUpbtn {
+  background-color: var(--hoverColor);
+}
+
+
+.btnDIV {
+  display: inline-block;
+  width: 24%;
+  padding: auto;
+}
+
+ .btnDIV:not(:last-child){
+  border-right: 2px solid black;
+  border-spacing: 0;
+}
+
+
+#patternTableContainer {
+  max-height: 60%;
+  max-width: fit-content;
+  overflow: auto;
+}
+
+#patternSelectTableWrapper {
+  width: 60%;
+
+}
+
+.patternSelectTable {
+  --border: 2px solid black;
+  border-radius: 10px;
+ 
+  /* Don't change these properties */
+  border-spacing: 0;
+  border-collapse: separate;
+  border: var(--border);
+  overflow: hidden;
+  width: 100%;
+ }
+ 
+ /* Apply a border to the right of all but the last column */
+ .patternSelectTable th:not(:last-child),
+ .patternSelectTable td:not(:last-child) {
+  border-right: var(--border);
+ }
+
+
+ /* Apply a border to the bottom of all but the last row */
+ .patternSelectTable>thead>tr:not(:last-child)>th,
+ .patternSelectTable>thead>tr:not(:last-child)>td,
+ .patternSelectTable>tbody>tr:not(:last-child)>th,
+ .patternSelectTable>tbody>tr:not(:last-child)>td,
+ .patternSelectTable>tfoot>tr:not(:last-child)>th,
+ .patternSelectTable>tfoot>tr:not(:last-child)>td,
+ .patternSelectTable>tr:not(:last-child)>td,
+ .patternSelectTable>tr:not(:last-child)>th,
+ .patternSelectTable>thead:not(:last-child),
+ .patternSelectTable>tbody:not(:last-child),
+ .patternSelectTable>tfoot:not(:last-child) {
+   border-bottom: var(--border);
+  }
+
+
+ .patternSelectTable tr:nth-child(even){
+  background-color: #d1d1d1;
+ }
+
+ .patternSelectTable tr:hover {
+  background-color: var(--hoverColor);
+ }
+ 
+ .patternSelectTable tr.active {
+  background-color: var(--hoverColor);
+ }
+ 
+
+ .patternSelectTable td{
+  text-align: center;
+  width: 10%;
+ }
+
+ .patternSelectTable th {
+  background-color: #d1d1d1;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid black;
+ }
+
+ #patternSelectTable{
+  width: 100%;
+  min-height: 10%;
+  max-height: 30%;
+  margin: 0;
+  padding: 0;
+}
+
+.patternSelectBtn {
+  display: block;
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  padding: 5px 0px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+
+#patternSelectTableWrapper {
+  width: 60%;
+
+}
+
+details {
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  padding: 0.5em 0.5em 0;
+  width: 100%;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+summary {
+  font-weight: bold;
+  font-size: 12px;
+  margin: -0.5em -0.5em 0;
+  padding: 0.5em;
+  width: 100%;
+}
+
+details[open] {
+  padding: 0.5em;
+}
+
+details[open] summary {
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 0.5em;
+}
+
+.commandButton button{
+  appearance: none;
+  backface-visibility: hidden;
+  background-color: var( --activeColor);
+  border-radius: 8px;
+  border-style: none;
+  box-shadow: rgba(39, 174, 96, .15) 0 4px 9px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Inter,-apple-system,system-ui,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.5;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  outline: none;
+  overflow: hidden;
+  padding: 5px 20px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  transform: translate3d(0, 0, 0);
+  transition: all .3s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.commandButton button:hover {
+  background-color: var(--hoverColor);
+  opacity: 1;
+  transform: translateY(0);
+  transition-duration: .35s;
+  box-shadow: rgba(39, 174, 96, .2) 0 6px 12px;
+}
+
+.commandButton button:active {
+  transform: translateY(2px);
+  transition-duration: .35s;
+}
+
+.commandButton button:hover {
+}

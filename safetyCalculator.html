@@ -1,0 +1,446 @@
+<html lang="en">
+	<title>Safety Calculations</title>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/style.css">
+  </head>
+  <body>
+
+
+<div id="canvasDisplayWrapper">
+	<div class="displayCanvasDIV" id="displayCanvasDIV">
+	</div>
+</div>
+
+<div id="tabDisplayWrapper">
+<!-- Start of Tab Links -->
+	<div class="tab">
+		<button type="button" class="tabLink active" onClick="changeTab(0)">Safe Distance Calculation</button>
+		<button type="button" class="tabLink" onClick="changeTab(1)">Light Curtain Muting</button>
+		<button type="button" class="tabLink" onClick="changeTab(2)">Reach-Over Calculations</button>
+		<button type="button" class="tabLink" onClick="changeTab(3)">Tab 4 (TBD)</button>
+	</div>
+
+<!-- Start of Tab Content -->
+<!-- Safety Distance Calculation (Initialized as open) -->
+	<div id="safeDistCalc" class="tabContent active" style="display: flex">
+		<div class="tabContentContainer active">
+			<span class="inputHeader">Safety Device To Be Used:</span> 						
+				<select name="safeDistDeviceSelect" id="safeDistDeviceSelect" size="1">
+					<option value="lightCurtain">Light Curtain</option>
+					<option value="areaScanner">Area Scanner</option>
+					<option value="rfSensor">RF Sensor</option>
+					<option value="safeMat">Safety Mat</option>
+					<option value="rfSensor">RF Sensor</option>
+					<option value="singleControlDev">Single Control Device</option>
+					<option value="twoHandControl">Two Hand Control</option>
+					<option value="physGuard">Physical Guarding</option>
+				</select>
+			<br>
+		
+			<div class="inputGridWrapperHeader" id="requiredSafeDistInput" style="display: grid">	
+				<div name="totalStopTime">Total Stop Time / Reaction Time: </div>
+				<div class="toolTip"><i class="toolTipIcon">i</i>
+					<p class="toolTipInfo">
+					  <span class="info">	This is the total time it takes to ensure<br>
+											any hazardous motion has stopped. Either <br>
+											input the value if known or use the calculator<br>
+											to count up all response times for the longest<br>
+											chain of events.</span>
+					</p>
+				</div>	
+				<div class="inputGrid">
+					<input type="number" id="totalStopTime" name="totalStopTime" value="0" min="0" title="" step="0.1" style="width: 5%">		
+				</div>
+				<div class="inputUnitsGrid">								
+					<select name="totalStopTimeUnits" id="totalStopTimeUnits" size="1">
+						<option value="ms">ms</option>
+						<option value="sec">sec</option>
+						<option value="min">min</option>
+					</select>
+				</div>
+				<div id="totalTimeCalcForm" style="display: flex; grid-column-start: 2; grid-column-end: 5;">
+					<details id="totalStopTimeCalcDetail">
+					<summary>Use Total Stop Time Calculator</summary>
+						<form method="post" id="totalStopTimeCalc" action="">
+							<!-- Members Will Be Added on Load & When Needed -->
+						</form>
+				</details>
+				</div>
+
+				<div name="safeDistReadout">Minimum Safe Distance: </div>
+				<div class="toolTip"><i class="toolTipIcon">i</i>
+					<p class="toolTipInfo">
+					  <span class="info">	This is the minimum distance required<br>
+											between the safety device and any hazardous<br>
+											motion.</span>
+					</p>
+				</div>	
+				<div class="inputGrid">
+					Std: <input type="number" id="safeDistReadoutStd" name="safeDistReadoutStd" title="Minimum Safe Distance (Standard)" readonly>
+					<br>					
+					Crv: <input type="number" id="safeDistReadoutCrv" name="safeDistReadoutCrv" title="Minimum Safe Distance (Conservative)" readonly>
+				</div>
+				<div class="inputUnitsGrid">								
+					<select name="safeDistReadoutUnits" id="safeDistReadoutUnits" size="1">
+					<option value="mm">mm</option>
+					<option value="cm">cm</option>
+					<option value="m">m</option>
+					<option value="inch">inch</option>
+					<option value="ft">ft</option>
+					</select>
+				</div>
+			</div>		
+
+
+<!-- Start of Light Curtain Safe Distance Wrapper -->			
+		<div class="inputGridWrapper active" id="lightCurtainSafeDist" style="display: grid">		
+			<div>Light Curtain Object Resolution: </div>
+			<div class="toolTip"><i class="toolTipIcon">i</i>
+				<p class="toolTipInfo">
+				  <span class="info">This value is the rated minimum object resolution given by manufacturer.<br><br>
+									 If this is unknown, take the light curtain beam spacing and add 10mm.</span>
+				</p>
+			</div>
+		
+			<div class="inputGrid">
+				<input type="number" id="objectResolutionValue" name="objectResolutionValue" value="0" min="0" title="" step="0.1" style="width: 5%">
+			</div>
+			<div class="inputUnitsGrid">
+				<select name="objResolutionUnits" id="objResolutionUnits" size="1">
+					<option value="mm">mm</option>
+					<option value="inch">inch</option>
+				</select>
+			</div>
+
+			<div>Light Curtain Mounting: </div>
+			<div class="toolTip"><i class="toolTipIcon">i</i>
+				<p class="toolTipInfo">
+				  <span class="info">Is the light curtain mounted straight up and down? (Vertical)<br>
+													Is it mounted so the sensing area is flat? (Horizontal)<br>
+													Or is it mounted at an angle? (Angled)</span>
+				</p>
+			</div>
+			<div class="inputGrid">
+				<select name="lightCurtainMounting" class="inputSelect" id="lightCurtainMounting" size="1">
+					<option value="vertical">Vertical</option>
+					<option value="horizontal">Horizontal</option>
+					<option value="angled">At An Angle</option>
+				</select>
+			</div>					
+			<div class="inputUnitsGrid">
+			</div>			
+
+			<div class="lightCurtainAngleMount" style="display: none">Light Curtain Mounting Angle: </div>
+			<div class="lightCurtainAngleMount toolTip" style="display: none"><i class="toolTipIcon">i</i>
+				<p class="toolTipInfo">
+				  <span class="info">Input what angle the light curtain<br>
+															is mounted from the ground.</span>
+				</p>
+			</div>
+		
+			<div class="lightCurtainAngleMount inputGrid" style="display: none">
+				<input type="number" id="lightCurtainMountAngle" name="lightCurtainMountAngle" value="0" min="0" title="" step="0.1" style="width: 5%">		
+			</div>
+			<div class="lightCurtainAngleMount inputUnitsGrid" style="display: none">								
+				<i>°</i>
+			</div>
+
+			<div class="lightCurtainTopHorz">Light Curtain Top Mounting Height: </div>
+			<div class="lightCurtainTopHorz toolTip"><i class="toolTipIcon">i</i>
+				<p class="toolTipInfo">
+				  <span class="info">	Input distance from floor to the top<br>
+										of the sensing area.</span>
+				</p>
+			</div>
+		
+			<div class="lightCurtainTopHorz inputGrid">
+				<input type="number" id="lightCurtainTopHorz" name="lightCurtainTopHorz" value="0" min="0" title="" step="0.1" style="width: 5%">		
+			</div>
+			<div class="lightCurtainTopHorz inputUnitsGrid">								
+				<select name="lightCurtainTopHorzUnits" id="lightCurtainTopHorzUnits" size="1">
+					<option value="mm">mm</option>
+					<option value="inch">inch</option>
+				</select>
+			</div>				
+			
+			<div class="lightCurtainBottomHorz">Light Curtain Bottom Mounting Height: </div>
+			<div class="lightCurtainBottomHorz toolTip"><i class="toolTipIcon">i</i>
+				<p class="toolTipInfo">
+				  <span class="info">	Input distance from floor to the bottom<br>
+										of the sensing area.</span>
+				</p>
+			</div>
+		
+			<div class="lightCurtainBottomHorz inputGrid">
+				<input type="number" id="lightCurtainBottomHorz" name="lightCurtainBottomHorz" value="0" min="0" title="" step="0.1" style="width: 5%">		
+			</div>
+			<div class="lightCurtainBottomHorz inputUnitsGrid">								
+				<select name="lightCurtainBottomHorzzUnits" id="lightCurtainBottomHorzUnits" size="1">
+					<option value="mm">mm</option>
+					<option value="inch">inch</option>
+				</select>
+			</div>	
+			
+		</div>
+		
+<!-- Start of Area Scanner Safe Distance Wrapper -->			
+		<div class="inputGridWrapper" id="areaScannerSafeDist">		
+			<div>Area Scanner Resolution: </div>
+			<div class="toolTip"><i class="toolTipIcon">i</i>
+				<p class="toolTipInfo">
+				  <span class="info">This value is the rated minimum object resolution given by manufacturer.<br><br>
+									 If this is unknown, take the light curtain beam spacing and add 10mm.</span>
+				</p>
+			</div>
+		
+			<div class="inputGrid">
+				<input type="number" id="areaScanResolutionValue" name="areaScanResolutionValue" value="0" min="0" title="" step="0.1" style="width: 5%">
+			</div>
+			<div class="inputUnitsGrid">
+				<select name="areaScanResolutionValueUnits" id="areaScanResolutionValueUnits" size="1">
+					<option value="mm">mm</option>
+					<option value="inch">inch</option>
+				</select>
+			</div>
+		
+		</div>
+	</div>
+</div>
+
+<!-- Start of Primary Input Content -->
+<div id="mutingCalc" class="tabContent">
+	<div class="tabContentContainer">
+			<span class="inputHeader">Muting Type:</span> 						
+				<select name="mutingTypeInput" id="mutingTypeInput" size="1">
+					<option value="lTypeExit">2-Sensor Parallel (Exit Only)</option>
+					<option value="lTypeCross">2-Sensor Cross</option>
+					<option value="tTypeParallel">4-Sensor Parallel</option>
+					<option value="tTypeSeq">4-Sensor Sequential</option>
+				</select>
+			<br>
+		
+			<div class="inputGridWrapperHeader" id="mutingCalcType">	
+				<div name="muteCalcType">Solve Type:</div>
+				<div class="toolTip"><i class="toolTipIcon">i</i>
+					<p class="toolTipInfo">
+					  <span class="info">	Input if you wish to solve for muting times<br>
+											or if you want to solve for mute sensor positions.</span>
+					</p>
+				</div>	
+				<div class="inputGrid">						
+					<select name="mutingCalcType" id="mutingCalcType" size="1">
+						<option value="muteTime">Find Muting Times</option>
+						<option value="sensorSpace">Find Sensor Spacing</option>
+					</select>
+				</div>
+				<div class="inputUnitsGrid">						
+
+				</div>
+			</div>		
+
+
+<!-- Start of Light Curtain Mute Sensor Spacing Wrapper -->			
+		<div class="inputGridWrapper active" id="mutingSensorSpacing">		
+			<div>Muting Sensor Spacing... NEED WORK: </div>
+			<div class="toolTip"><i class="toolTipIcon">i</i>
+				<p class="toolTipInfo">
+				  <span class="info">MOAR WORK PLZ. AIN'T DUN.</span>
+				</p>
+			</div>
+		
+			<div class="inputGrid">
+				<input type="number" id="MuteSensorValue" name="MuteSensorValue" value="0" min="0" title="" step="0.1" style="width: 5%">
+			</div>
+			<div class="inputUnitsGrid">
+				<select name="MuteSensorValueUnits" id="oMuteSensorValueUnits" size="1">
+					<option value="mm">mm</option>
+					<option value="inch">inch</option>
+				</select>
+			</div>
+			
+		</div>
+	</div>
+
+
+	</div>
+
+
+
+<!-- Start of Primary Output Content -->
+	<div id="reachOverTab" class="tabContent">
+		<div id="reachOver" class="tabContentContainer">
+			<div class="inputGridWrapperHeader" id="reachOverInput" style="display: grid">	
+				<!-- Hazard Height Input -->
+				<div name="hazardHeight">Hazard Height (From Base): </div>
+				<div class="toolTip"><i class="toolTipIcon">i</i>
+					<p class="toolTipInfo">
+					  <span class="info">	This is the total distance from the ground<br>
+											or other limiting baseline in which the hazard<br>
+											lies to the top-most part of the hazard.<br>
+											This could be from the floor, or from a platform,<br>
+											or any other base.</span>
+					</p>
+				</div>	
+				<div class="inputGrid">
+					<input type="number" id="hazardHeight" name="hazardHeight" value="0" min="0" title="" step="0.1" style="width: 5%">		
+				</div>
+				<div class="inputUnitsGrid">								
+					<select name="hazardHeightUnits" id="hazardHeightUnits" size="1">
+					<option value="mm">mm</option>
+					<option value="cm">cm</option>
+					<option value="m">m</option>
+					<option value="inch">inch</option>
+					<option value="ft">ft</option>
+					</select>
+				</div>
+
+				<!-- Protection Height Input -->
+				<div name="protectionHeight">Protection Height (From Base): </div>
+				<div class="toolTip"><i class="toolTipIcon">i</i>
+					<p class="toolTipInfo">
+					  <span class="info">	This is the total distance from the ground<br>
+											or other limiting baseline in which the hazard<br>
+											lies to the top of the protection device.<br>
+											This could be a physical guard, light curtain,<br>
+											or other safety device.</span>
+					</p>
+				</div>	
+				<div class="inputGrid">
+					<input type="number" id="protectionHeight" name="protectionHeight" value="0" min="0" title="" step="0.1" style="width: 5%">		
+				</div>
+				<div class="inputUnitsGrid">								
+					<select name="protectionHeightUnits" id="protectionHeightUnits" size="1">
+					<option value="mm">mm</option>
+					<option value="cm">cm</option>
+					<option value="m">m</option>
+					<option value="inch">inch</option>
+					<option value="ft">ft</option>
+					</select>
+				</div>
+
+				<div name="safeDistReadout">Minimum Horizontal Safe Distance: </div>
+				<div class="toolTip"><i class="toolTipIcon">i</i>
+					<p class="toolTipInfo">
+					  <span class="info">	This is the minimum horizontal distance<br>
+											required between the safety device and the<br>
+											top of the given Hazard</span>
+					</p>
+				</div>	
+				<div class="inputGrid">
+					Low Risk: <input type="number" id="safeHorzDistReadoutLowRisk" name="safeHorzDistReadoutLowRisk" title="Minimum Horizontal Safe Distance (Low Risk)" readonly>
+					<br>					
+					High Risk: <input type="number" id="safeHorzDistReadoutHighRisk" name="safeHorzDistReadoutHighRisk" title="Minimum Horizontal Safe Distance (High Risk)" readonly>
+				</div>
+				<div class="inputUnitsGrid" style="padding-top: 1em">								
+					<select name="safeHorzDistReadoutUnits" id="safeHorzDistReadoutUnits" size="1">
+					<option value="mm">mm</option>
+					<option value="cm">cm</option>
+					<option value="m">m</option>
+					<option value="inch">inch</option>
+					<option value="ft">ft</option>
+					</select>
+				</div>
+			</div>	
+		</div>
+	</div>
+	
+	<!-- Pattern Select Tab (Initialize as displayed) -->
+	<div id="patternSelectTab" class="tabContent">
+		<div class="tabContentMargins"></div>
+		<div class="tabContentContainer">
+			<span class="indentSpan"><bold>Pattern To Display:&emsp;</bold></span>
+			<div class="dropdown">
+				<button type="button" class="dropbtn" id="patternTypeSelButton" title="Pattern Type Select Button">Column</button>
+				<div class="dropdown-content">
+					<button type="button" class="dropBtnSel active" onclick="changePatternStyleBtn(0)">Column</button>
+					<button type="button" class="dropBtnSel" onclick="changePatternStyleBtn(1)">Interlock</button>
+					<button type="button" class="dropBtnSel" onclick="changePatternStyleBtn(2)">Trilock</button>
+				</div>
+			</div>
+			
+			<div id="patternSelectTableWrapper">
+				<table class="patternSelectTable" id="patternSelectHeader">
+					<thead>
+					<tr>
+						<th width="25%">Pattern Type</th>
+						<th width="25%">Cnt Per Layer</th>
+						<th width="25%">Total Count</th>
+						<th width="25%">Pack Efficiency</th>
+					</tr>
+					</thead>
+				</table>
+				<div id="patternTableContainer" class ="patternSelectBtn-content">			
+					<table class="patternSelectTable" id="patternSelectTable" width="60%">
+						<tbody>
+							<!-- Table will be updated VIA Javascript-->
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div id="patternSelectBottomDIV" class="bottomDisplayWrapper">
+				<div id="packOptionInputDIV" class="bottomDisplayDIV">
+					<label for="inputPackOption">Pack Option: </label>
+						<div class="dropup">
+							<button type="button" class="dropUpbtn" id="packOptionBtn" title="Pack Option:">No Spacing</button>
+							<div class="dropup-content">
+								<button type="button" class="packOptionDropBtnSel active" onclick="changePackBtn(0)">No Spacing</button>
+								<button type="button" class="packOptionDropBtnSel" onclick="changePackBtn(1)">Space Along Width</button>
+								<button type="button" class="packOptionDropBtnSel" onclick="changePackBtn(2)">Space Along Length</button>
+							</div>
+						</div>
+				</div>
+				<div id="alignmentVectorInputDIV" class="bottomDisplayDIV">
+					<label for="inputAlignmentVector">Alignment Vector: </label>
+						<div class="dropup">
+							<button type="button" class="dropUpbtn" id="alignVectorBtn" title="Alignment Vector:">Center of Pallet</button>
+							<div class="dropup-content">
+								<button type="button" class="alignVectorDropBtnSel active" onclick="changeAlignmentVectorBtn(0)">Center of Pallet</button>
+								<button type="button" class="alignVectorDropBtnSel" onclick="changeAlignmentVectorBtn(1)">Top Left</button>
+								<button type="button" class="alignVectorDropBtnSel" onclick="changeAlignmentVectorBtn(2)">Top</button>
+								<button type="button" class="alignVectorDropBtnSel" onclick="changeAlignmentVectorBtn(3)">Top Right</button>
+								<button type="button" class="alignVectorDropBtnSel" onclick="changeAlignmentVectorBtn(4)">Left</button>
+								<button type="button" class="alignVectorDropBtnSel" onclick="changeAlignmentVectorBtn(5)">Right</button>
+								<button type="button" class="alignVectorDropBtnSel" onclick="changeAlignmentVectorBtn(6)">Bottom Left</button>
+								<button type="button" class="alignVectorDropBtnSel" onclick="changeAlignmentVectorBtn(7)">Bottom</button>
+								<button type="button" class="alignVectorDropBtnSel" onclick="changeAlignmentVectorBtn(8)">Bottom Right</button>
+							</div>
+						</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">  </script>
+<script src="src/bootstrap.min.js"></script>	<!-- Laziness & Helpfulness -->
+<script src="src/conversionCalc.js"></script>	<!-- Unit Conversion Functions -->
+<script src="src/displayHelper.js"></script>	<!-- Control if Display Within Site -->
+<script src="src/canvasDisplay.js"></script>	<!-- Draw on Canvas Based on Selected -->
+<script src="src/script.js"></script>			<!-- Playground and Confuuuusion -->
+<script src="src/safetyCalc.js"></script>		<!-- Safety Calculation Functions -->
+<script src="src/reachOvercalc.js"></script>	<!-- ISO Reach Over Calculation Functions -->
+<script type = "text/javascript">				<!-- Other Stuff :3 -->
+
+	// On initial page load, draw a pattern on the top
+window.onload = function () {
+	// Do stuff on load
+};
+
+	// Whenever the window is resized, redraw pattern
+//window.addEventListener('resize', reset);
+		
+
+
+		// Grab all values and transfer to variables used in 'script.js'
+	function transferResult(){	
+		// Do nothing for now
+	}
+
+
+
+</script>
