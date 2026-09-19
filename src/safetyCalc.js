@@ -3,30 +3,34 @@
 function updateSafeDistance(){
 		// Define standard approach speeds
 		// ISO uses 1.6 m/s for safe distances > 500mm, and 2.0 m/s for safe distances < 500mm
-		//	ANSI does not give an approach speed, but references 1.6 m/s as a typical value
-	const standardApproachSpeed = {value: 1.6, unit: "m/sec"};
-	const conservativeApproachSpeed = {value: 2.0, unit: "m/sec"};
+		//	ANSI uses 1.6 m/s as a typical value
+	const standardApproachSpeed = {value: 1600, unit: "mm/sec"};
+	const conservativeApproachSpeed = {value: 2000, unit: "mm/sec"};
 		
 		// Declare minimum safe distance, read final distance unit
 	var minimumSafeDistStd = {value: 0, unit: document.getElementById('safeDistReadoutUnits').value};
 	var minimumSafeDistConservative = {value: 0, unit: document.getElementById('safeDistReadoutUnits').value};
-	
-		// Find conversion from meter -> desired length unit
-	let finalSafeDistLengthConv = convertLength({value: 1, unit: "m"}, minimumSafeDistStd.unit);
-		// Find conversion from second -> Stop Time unit
-	let finalSafeDistTimeConv = convertTime({value: 1, unit: "sec"}, totalStopTime.unit);
-	
-		// Calculate the constant value between standard and conservative speeds
-	const minSafeDistanceConst = parseFloat(totalStopTime.value) * ( parseFloat(finalSafeDistLengthConv.value)/parseFloat(finalSafeDistTimeConv.value))
-	
-		// Calculate both conservaitve & standard (std) safe distances utilizing constant calculated above		
-	minimumSafeDistStd.value = parseFloat((parseFloat(standardApproachSpeed.value) * minSafeDistanceConst).toFixed(3));
-	minimumSafeDistConservative.value = parseFloat((parseFloat(conservativeApproachSpeed.value) *  minSafeDistanceConst).toFixed(3));
 
-		// Determine if distance speed is valid, if not set to 0
-	minimumSafeDistStd.value = (minimumSafeDistStd.value >= 0) ? minimumSafeDistStd.value : 0;
-	minimumSafeDistConservative.value = (minimumSafeDistConservative.value >= 0) ? minimumSafeDistConservative.value : 0;	
-	
+	// Convert input time to seconds. Calculate everything in mm & sec
+	const safeDistTimeConv = convertTime(totalStopTime,"sec")
+
+		// Determine if result is < 100mm, if so, set to the minimum of 100mm. If >=, calculate safe distance
+	if ( parseFloat(standardApproachSpeed.value) * parseFloat(safeDistTimeConv.value) >= 100 ) {
+		let tempDist = {value: parseFloat(standardApproachSpeed.value * safeDistTimeConv.value), unit: "mm"};
+		minimumSafeDistStd.value = parseFloat( convertLength(tempDist, minimumSafeDistStd.unit).value );
+	} else {
+		let tempDist = {value: parseFloat(100), unit: "mm"};
+		minimumSafeDistStd.value = parseFloat( convertLength(tempDist, minimumSafeDistStd.unit).value );
+	}
+		// Conservative calcs
+	if ( parseFloat(conservativeApproachSpeed.value * safeDistTimeConv.value) >= 100 ) {
+		let tempDist = {value: parseFloat(conservativeApproachSpeed.value * safeDistTimeConv.value), unit: "mm"};
+		minimumSafeDistConservative.value = parseFloat( convertLength(tempDist, minimumSafeDistStd.unit).value );
+	} else {
+		let tempDist = {value: parseFloat(100), unit: "mm"};
+		minimumSafeDistConservative.value = parseFloat( convertLength(tempDist, minimumSafeDistConservative.unit).value );
+	}
+
 		// Write values to Displays
 	document.getElementById('safeDistReadoutStd').value = minimumSafeDistStd.value;
 	document.getElementById('safeDistReadoutCrv').value = minimumSafeDistConservative.value;	

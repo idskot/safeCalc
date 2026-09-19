@@ -69,7 +69,11 @@
 				</details>
 				</div>
 
-				<div name="safeDistReadout">Minimum Safe Distance: </div>
+				<div name="safeDistReadout">
+					Minimum Safe Distance: 
+					<br>
+					<div style="font-size: small; padding-left: 40px">[ S = (K•T) ]</div>
+				</div>
 				<div class="toolTip"><i class="toolTipIcon">i</i>
 					<p class="toolTipInfo">
 					  <span class="info">	This is the minimum distance required<br>
@@ -78,9 +82,38 @@
 					</p>
 				</div>	
 				<div class="inputGrid">
-					Std: <input type="number" id="safeDistReadoutStd" name="safeDistReadoutStd" title="Minimum Safe Distance (Standard)" readonly>
+					Std:
+					<div class="toolTip"><i class="toolTipIcon">i</i>
+						<p class="toolTipInfo">
+							<span class="info">	Standard (Std) is calculated using<br>
+												approach speed (K) = 1.6 m/s. This <br>
+												 is valid for ANSI B11.19 and <br>
+												 ISO 13855 Low Risk.<br>
+												<br><br>
+												Minimum distance should not<br>
+												be less than 100 mm.</span>
+						</p>
+					</div>	 
+					<input type="number" id="safeDistReadoutStd" name="safeDistReadoutStd" title="Minimum Safe Distance (Standard)" readonly>
 					<br>					
-					Crv: <input type="number" id="safeDistReadoutCrv" name="safeDistReadoutCrv" title="Minimum Safe Distance (Conservative)" readonly>
+					Crv:
+					<div class="toolTip"><i class="toolTipIcon">i</i>
+						<p class="toolTipInfo">
+							<span class="info">	Conservative (Crv) is calculated using<br>
+												approach speed (K) of 2.0 m/s.<br>
+												For ISO 13855, the distance<br>
+												should be calculated <br>
+												using approach speed (K) = 2.0 m/s.<br><br>
+												If the result is ≥ 500 mm,<br> 
+												based on the standard, the<br>
+												distance can be re-calculated<br>
+												using K = 1.6 m/s.<br>
+												<br><br>
+												Minimum distance should not<br>
+												be less than 100 mm.</span>
+						</p>
+					</div>						
+					<input type="number" id="safeDistReadoutCrv" name="safeDistReadoutCrv" title="Minimum Safe Distance (Conservative)" readonly>
 				</div>
 				<div class="inputUnitsGrid">								
 					<select name="safeDistReadoutUnits" id="safeDistReadoutUnits" size="1">
@@ -105,9 +138,16 @@
 			</div>
 		
 			<div class="inputGrid">
-				<input type="number" id="objectResolutionValue" name="objectResolutionValue" value="0" min="0" title="" step="0.1" style="width: 5%">
+				<input list="objectResolutionValueList" id="objectResolutionValue" name="objectResolutionValue" style="width: 25%; min-width: 100px; text-align: center" />
+				<datalist id="objectResolutionValueList" style="width: 5%">
+					<option value="14">
+					<option value="25">
+					<option value="35">
+					<option value="45">
+					<option value="152.4">
+				</datalist>
 			</div>
-			<div class="inputUnitsGrid">
+			<div class="inputUnitsGrid">					
 				<select name="objResolutionUnits" id="objResolutionUnits" size="1">
 					<option value="mm">mm</option>
 					<option value="inch">inch</option>

@@ -41,7 +41,7 @@ function convertTime(timeInput, desiredOutputUnit){
 	{startUnit: 'hr',  ms: 3600000, sec: 3600, min: 60, hr: 1, day: 1/24},
 	{startUnit: 'day', ms: 86400000, sec: 86400, min: 1440, hr: 24, day: 1}
 	];
-	
+
 		// Determine pointer of conversion based on input length unit
 	let timeConvInitPointer = timeConversionUnits.findIndex(target => target.startUnit === timeInput.unit);
 
